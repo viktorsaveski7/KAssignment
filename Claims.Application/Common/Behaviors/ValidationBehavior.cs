@@ -4,6 +4,10 @@ using MediatR;
 
 namespace Claims.Application.Common.Behaviors;
 
+/// <summary>
+/// Runs every validator registered for a request and short-circuits with a failed result rather than
+/// calling the handler, so a validation failure maps to 400 through the same path as any other failure.
+/// </summary>
 public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
     where TResponse : Result

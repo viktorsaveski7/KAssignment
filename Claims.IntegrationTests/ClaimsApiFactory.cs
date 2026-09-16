@@ -12,6 +12,7 @@ using Testcontainers.MsSql;
 
 namespace Claims.IntegrationTests;
 
+/// <summary>Boots the API against throwaway SQL Server and MongoDB containers, started once per run.</summary>
 public class ClaimsApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private const string DatabaseName = "ClaimsIntegrationTests";

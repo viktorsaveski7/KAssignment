@@ -2,6 +2,10 @@ using Claims.Domain.Entities;
 
 namespace Claims.Application.Common.Interfaces;
 
+/// <summary>
+/// Persistence operations for claims. Intentionally narrow: it exposes the operations the application
+/// performs rather than a queryable surface, so no storage concern leaks upwards.
+/// </summary>
 public interface IClaimRepository
 {
     Task<IReadOnlyList<Claim>> GetAllAsync(CancellationToken cancellationToken = default);

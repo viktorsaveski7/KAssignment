@@ -2,6 +2,10 @@ using Claims.Domain.Enums;
 
 namespace Claims.Domain.Premium;
 
+/// <summary>
+/// Prices a cover from its type and length: the first 30 days at the full day rate, the next 150 at a
+/// discount, and the remainder at a further discount.
+/// </summary>
 public sealed class PremiumCalculator : IPremiumCalculator
 {
     private const decimal BaseDayRate = 1250m;
@@ -41,6 +45,8 @@ public sealed class PremiumCalculator : IPremiumCalculator
     private static decimal Discount(CoverType coverType) =>
         coverType == CoverType.Yacht ? 0.05m : 0.02m;
 
+    // The specification calls the third band "discounted by an additional 3% / 1%", so the two
+    // discounts are cumulative: 8% for a yacht, 3% for everything else.
     private static decimal FurtherDiscount(CoverType coverType) =>
         Discount(coverType) + AdditionalDiscount(coverType);
 

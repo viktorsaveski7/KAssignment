@@ -3,6 +3,7 @@ using Claims.Domain.Premium;
 
 namespace Claims.Domain.Entities;
 
+/// <summary>An insurance cover taken out on a vessel for a fixed period.</summary>
 public class Cover
 {
     private Cover()
@@ -41,5 +42,6 @@ public class Cover
         return new Cover(Guid.NewGuid().ToString(), startDate, endDate, type, premium);
     }
 
+    /// <summary>True when the date falls inside the insurance period, both bounds included.</summary>
     public bool CoversDate(DateOnly date) => date >= StartDate && date <= EndDate;
 }

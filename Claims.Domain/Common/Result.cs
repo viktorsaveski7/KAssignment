@@ -1,5 +1,9 @@
 namespace Claims.Domain.Common;
 
+/// <summary>
+/// Outcome of an operation that can fail for a reason the caller is expected to handle. Expected
+/// failures are values rather than exceptions; genuine defects are still thrown.
+/// </summary>
 public class Result
 {
     private static readonly IReadOnlyList<string> NoErrors = Array.Empty<string>();

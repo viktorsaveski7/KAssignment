@@ -2,6 +2,10 @@ using Claims.Application.Common.Interfaces;
 
 namespace Claims.Infrastructure.Auditing;
 
+/// <summary>
+/// Queues audit entries instead of writing them, so the request never waits on the audit database.
+/// Entries are timestamped on enqueue, not on write, so the record reflects when the operation happened.
+/// </summary>
 public sealed class QueuedAuditService : IAuditService
 {
     private readonly AuditQueue _queue;

@@ -10,6 +10,7 @@ using MongoDB.Driver;
 
 namespace Claims.Infrastructure;
 
+/// <summary>Registers the persistence contexts, repositories and audit pipeline.</summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
@@ -22,6 +23,8 @@ public static class DependencyInjection
 
         services.AddDbContext<AuditContext>(options => options.UseSqlServer(auditConnectionString));
 
+// MongoClient is thread-safe and owns a connection pool, so it is registered once. Creating one per
+        // DbContext also makes EF build a new internal service provider each time, which it caps at twenty.
         services.AddSingleton<IMongoClient>(_ => new MongoClient(claimsConnectionString));
 
         services.AddDbContext<ClaimsContext>((provider, options) =>

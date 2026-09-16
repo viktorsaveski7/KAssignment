@@ -2,6 +2,7 @@ using Claims.Domain.Enums;
 
 namespace Claims.Domain.Entities;
 
+/// <summary>A claim filed by a policyholder against an existing cover.</summary>
 public class Claim
 {
     private Claim()

@@ -20,6 +20,8 @@ public sealed class CoverConfiguration : IEntityTypeConfiguration<Cover>
         builder.Property(cover => cover.EndDate)
             .HasElementName("endDate")
             .HasConversion(DateOnlyConverter.Instance);
+        // Stored as "claimType" because that is what the original schema used; renaming would orphan
+        // existing documents.
         builder.Property(cover => cover.Type).HasElementName("claimType");
         builder.Property(cover => cover.Premium).HasElementName("premium");
     }

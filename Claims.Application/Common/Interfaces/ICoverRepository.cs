@@ -2,6 +2,7 @@ using Claims.Domain.Entities;
 
 namespace Claims.Application.Common.Interfaces;
 
+/// <summary>Persistence operations for covers.</summary>
 public interface ICoverRepository
 {
     Task<IReadOnlyList<Cover>> GetAllAsync(CancellationToken cancellationToken = default);

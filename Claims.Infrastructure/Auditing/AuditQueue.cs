@@ -2,6 +2,11 @@ using System.Threading.Channels;
 
 namespace Claims.Infrastructure.Auditing;
 
+/// <summary>
+/// Hands audit entries from the request thread to the background writer. Bounded so a burst cannot
+/// exhaust memory, and it waits rather than drops when full: losing an audit record is worse than
+/// brief back-pressure.
+/// </summary>
 public sealed class AuditQueue
 {
     public const int DefaultCapacity = 10_000;

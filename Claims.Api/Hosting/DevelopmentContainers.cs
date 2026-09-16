@@ -4,8 +4,15 @@ using Testcontainers.MsSql;
 
 namespace Claims.Api.Hosting;
 
+/// <summary>Starts throwaway SQL Server and MongoDB containers so the API runs locally with no setup.</summary>
+/// <remarks>
+/// A development convenience, not part of the application. Switched off by setting
+/// UseDevelopmentContainers to false, which is what a hosted deployment does: it then reads
+/// ConnectionStrings:AuditDatabase and ConnectionStrings:ClaimsDatabase from ordinary configuration.
+/// </remarks>
 public sealed class DevelopmentContainers : IAsyncDisposable
 {
+    /// <summary>Configuration key that switches container bootstrapping on or off.</summary>
     public const string EnabledKey = "UseDevelopmentContainers";
 
     private readonly MsSqlContainer? _sqlContainer;
@@ -17,6 +24,7 @@ public sealed class DevelopmentContainers : IAsyncDisposable
         _mongoContainer = mongoContainer;
     }
 
+    /// <summary>Starts the containers when enabled and overlays their connection strings onto configuration.</summary>
     public static async Task<DevelopmentContainers> StartIfEnabledAsync(WebApplicationBuilder builder)
     {
         if (!builder.Configuration.GetValue(EnabledKey, false))
@@ -24,6 +32,7 @@ public sealed class DevelopmentContainers : IAsyncDisposable
             return new DevelopmentContainers(null, null);
         }
 
+        // On Linux the default image is unavailable, so pin the published one.
         var sqlContainer = (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
                 ? new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2022-latest")
                 : new MsSqlBuilder())
@@ -44,6 +53,7 @@ public sealed class DevelopmentContainers : IAsyncDisposable
         return new DevelopmentContainers(sqlContainer, mongoContainer);
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         if (_sqlContainer is not null)

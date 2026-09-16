@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Claims.Infrastructure.Auditing;
 
+/// <summary>Drains the audit queue and writes entries in batches.</summary>
 public sealed class AuditWriterService : BackgroundService
 {
     private const int MaxBatchSize = 100;
@@ -35,6 +36,7 @@ public sealed class AuditWriterService : BackgroundService
         {
         }
 
+        // Shutdown must not strand entries that are already queued.
         await DrainRemainingAsync();
     }
 
@@ -64,6 +66,7 @@ public sealed class AuditWriterService : BackgroundService
     {
         try
         {
+            // AuditContext is scoped and this service is a singleton, so a scope is created per batch.
             using var scope = _scopeFactory.CreateScope();
             var auditContext = scope.ServiceProvider.GetRequiredService<AuditContext>();
 
@@ -89,6 +92,7 @@ public sealed class AuditWriterService : BackgroundService
                 }
             }
 
+            // Deliberately not cancellable: once an entry has left the queue, abandoning the write loses it.
             await auditContext.SaveChangesAsync(CancellationToken.None);
         }
         catch (Exception exception)

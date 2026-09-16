@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Local development only; a hosted deployment supplies connection strings through configuration.
 await using var developmentContainers = await DevelopmentContainers.StartIfEnabledAsync(builder);
 
 builder.Services
@@ -21,6 +22,7 @@ builder.Services
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Expected failures already arrive as Result values; this covers everything else.
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
@@ -63,4 +65,5 @@ await using (var scope = app.Services.CreateAsyncScope())
 
 await app.RunAsync();
 
+/// <summary>Exposed so that WebApplicationFactory&lt;Program&gt; can bootstrap the API in tests.</summary>
 public partial class Program;
