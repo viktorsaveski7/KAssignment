@@ -5,6 +5,7 @@ using Claims.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 
 namespace Claims.Infrastructure;
@@ -21,15 +22,19 @@ public static class DependencyInjection
 
         services.AddDbContext<AuditContext>(options => options.UseSqlServer(auditConnectionString));
 
-        services.AddDbContext<ClaimsContext>(options =>
-        {
-            var client = new MongoClient(claimsConnectionString);
-            options.UseMongoDB(client, claimsDatabaseName);
-        });
+        services.AddSingleton<IMongoClient>(_ => new MongoClient(claimsConnectionString));
+
+        services.AddDbContext<ClaimsContext>((provider, options) =>
+            options.UseMongoDB(provider.GetRequiredService<IMongoClient>(), claimsDatabaseName));
+
+        services.TryAddSingleton(TimeProvider.System);
 
         services.AddScoped<IClaimRepository, ClaimRepository>();
         services.AddScoped<ICoverRepository, CoverRepository>();
-        services.AddScoped<IAuditService, AuditService>();
+
+        services.AddSingleton<AuditQueue>();
+        services.AddScoped<IAuditService, QueuedAuditService>();
+        services.AddHostedService<AuditWriterService>();
 
         return services;
     }

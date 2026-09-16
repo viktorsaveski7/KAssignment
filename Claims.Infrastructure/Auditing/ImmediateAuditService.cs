@@ -2,11 +2,11 @@ using Claims.Application.Common.Interfaces;
 
 namespace Claims.Infrastructure.Auditing;
 
-public sealed class AuditService : IAuditService
+public sealed class ImmediateAuditService : IAuditService
 {
     private readonly AuditContext _auditContext;
 
-    public AuditService(AuditContext auditContext) => _auditContext = auditContext;
+    public ImmediateAuditService(AuditContext auditContext) => _auditContext = auditContext;
 
     public async Task AuditClaimAsync(
         string claimId,
