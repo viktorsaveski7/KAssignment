@@ -4,37 +4,46 @@ namespace Claims.Domain.Premium;
 
 public sealed class PremiumCalculator : IPremiumCalculator
 {
+    private const decimal BaseDayRate = 1250m;
+
+    private const int FullRateDays = 30;
+    private const int DiscountedDays = 150;
+
     public decimal Compute(DateOnly startDate, DateOnly endDate, CoverType coverType)
     {
-        var multiplier = 1.3m;
-        if (coverType == CoverType.Yacht)
+        if (endDate < startDate)
         {
-            multiplier = 1.1m;
+            throw new ArgumentException(
+                $"The insurance period ends ({endDate:yyyy-MM-dd}) before it starts ({startDate:yyyy-MM-dd}).",
+                nameof(endDate));
         }
 
-        if (coverType == CoverType.PassengerShip)
-        {
-            multiplier = 1.2m;
-        }
+        var insuredDays = endDate.DayNumber - startDate.DayNumber + 1;
+        var dayRate = BaseDayRate * TypeMultiplier(coverType);
 
-        if (coverType == CoverType.Tanker)
-        {
-            multiplier = 1.5m;
-        }
+        var atFullRate = Math.Min(insuredDays, FullRateDays);
+        var atDiscount = Math.Clamp(insuredDays - FullRateDays, 0, DiscountedDays);
+        var atFurtherDiscount = Math.Max(insuredDays - FullRateDays - DiscountedDays, 0);
 
-        var premiumPerDay = 1250 * multiplier;
-        var insuranceLength = endDate.DayNumber - startDate.DayNumber;
-        var totalPremium = 0m;
-
-        for (var i = 0; i < insuranceLength; i++)
-        {
-            if (i < 30) totalPremium += premiumPerDay;
-            if (i < 180 && coverType == CoverType.Yacht) totalPremium += premiumPerDay - premiumPerDay * 0.05m;
-            else if (i < 180) totalPremium += premiumPerDay - premiumPerDay * 0.02m;
-            if (i < 365 && coverType != CoverType.Yacht) totalPremium += premiumPerDay - premiumPerDay * 0.03m;
-            else if (i < 365) totalPremium += premiumPerDay - premiumPerDay * 0.08m;
-        }
-
-        return totalPremium;
+        return (atFullRate * dayRate)
+             + (atDiscount * dayRate * (1m - Discount(coverType)))
+             + (atFurtherDiscount * dayRate * (1m - FurtherDiscount(coverType)));
     }
+
+    private static decimal TypeMultiplier(CoverType coverType) => coverType switch
+    {
+        CoverType.Yacht => 1.1m,
+        CoverType.PassengerShip => 1.2m,
+        CoverType.Tanker => 1.5m,
+        _ => 1.3m
+    };
+
+    private static decimal Discount(CoverType coverType) =>
+        coverType == CoverType.Yacht ? 0.05m : 0.02m;
+
+    private static decimal FurtherDiscount(CoverType coverType) =>
+        Discount(coverType) + AdditionalDiscount(coverType);
+
+    private static decimal AdditionalDiscount(CoverType coverType) =>
+        coverType == CoverType.Yacht ? 0.03m : 0.01m;
 }
