@@ -14,7 +14,7 @@ namespace Claims.Tests
 
             var client = application.CreateClient();
 
-            var response = await client.GetAsync("/Claims");
+            var response = await client.GetAsync("/Claims", TestContext.Current.CancellationToken);
 
             response.EnsureSuccessStatusCode();
 
