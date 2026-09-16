@@ -9,5 +9,5 @@ public record CreateClaimCommand(
     string CoverId,
     string Name,
     ClaimType Type,
-    DateTime Created,
+    DateOnly Created,
     decimal DamageCost) : IRequest<Result<ClaimDto>>;

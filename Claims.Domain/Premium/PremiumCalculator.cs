@@ -4,7 +4,7 @@ namespace Claims.Domain.Premium;
 
 public sealed class PremiumCalculator : IPremiumCalculator
 {
-    public decimal Compute(DateTime startDate, DateTime endDate, CoverType coverType)
+    public decimal Compute(DateOnly startDate, DateOnly endDate, CoverType coverType)
     {
         var multiplier = 1.3m;
         if (coverType == CoverType.Yacht)
@@ -23,7 +23,7 @@ public sealed class PremiumCalculator : IPremiumCalculator
         }
 
         var premiumPerDay = 1250 * multiplier;
-        var insuranceLength = (endDate - startDate).TotalDays;
+        var insuranceLength = endDate.DayNumber - startDate.DayNumber;
         var totalPremium = 0m;
 
         for (var i = 0; i < insuranceLength; i++)

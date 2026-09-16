@@ -6,7 +6,7 @@ namespace Claims.Application.Claims.Dtos;
 public record ClaimDto(
     string Id,
     string CoverId,
-    DateTime Created,
+    DateOnly Created,
     string Name,
     ClaimType Type,
     decimal DamageCost)

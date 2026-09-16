@@ -6,6 +6,6 @@ using MediatR;
 namespace Claims.Application.Covers.Commands.CreateCover;
 
 public record CreateCoverCommand(
-    DateTime StartDate,
-    DateTime EndDate,
+    DateOnly StartDate,
+    DateOnly EndDate,
     CoverType Type) : IRequest<Result<CoverDto>>;

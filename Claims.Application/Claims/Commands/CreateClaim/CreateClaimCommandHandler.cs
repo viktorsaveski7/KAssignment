@@ -30,6 +30,13 @@ public sealed class CreateClaimCommandHandler : IRequestHandler<CreateClaimComma
             return Result<ClaimDto>.NotFound($"Cover '{request.CoverId}' does not exist.");
         }
 
+        if (!cover.CoversDate(request.Created))
+        {
+            return Result<ClaimDto>.Invalid(
+                $"Created must fall within the cover period " +
+                $"({cover.StartDate:yyyy-MM-dd} to {cover.EndDate:yyyy-MM-dd}).");
+        }
+
         var claim = Claim.Create(
             request.CoverId,
             request.Name,

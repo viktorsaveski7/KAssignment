@@ -11,7 +11,7 @@ public class Claim
         Name = string.Empty;
     }
 
-    private Claim(string id, string coverId, string name, ClaimType type, DateTime created, decimal damageCost)
+    private Claim(string id, string coverId, string name, ClaimType type, DateOnly created, decimal damageCost)
     {
         Id = id;
         CoverId = coverId;
@@ -25,7 +25,7 @@ public class Claim
 
     public string CoverId { get; private set; }
 
-    public DateTime Created { get; private set; }
+    public DateOnly Created { get; private set; }
 
     public string Name { get; private set; }
 
@@ -33,6 +33,6 @@ public class Claim
 
     public decimal DamageCost { get; private set; }
 
-    public static Claim Create(string coverId, string name, ClaimType type, DateTime created, decimal damageCost) =>
+    public static Claim Create(string coverId, string name, ClaimType type, DateOnly created, decimal damageCost) =>
         new(Guid.NewGuid().ToString(), coverId, name, type, created, damageCost);
 }

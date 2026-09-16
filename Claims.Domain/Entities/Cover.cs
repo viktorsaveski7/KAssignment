@@ -10,7 +10,7 @@ public class Cover
         Id = string.Empty;
     }
 
-    private Cover(string id, DateTime startDate, DateTime endDate, CoverType type, decimal premium)
+    private Cover(string id, DateOnly startDate, DateOnly endDate, CoverType type, decimal premium)
     {
         Id = id;
         StartDate = startDate;
@@ -21,17 +21,17 @@ public class Cover
 
     public string Id { get; private set; }
 
-    public DateTime StartDate { get; private set; }
+    public DateOnly StartDate { get; private set; }
 
-    public DateTime EndDate { get; private set; }
+    public DateOnly EndDate { get; private set; }
 
     public CoverType Type { get; private set; }
 
     public decimal Premium { get; private set; }
 
     public static Cover Create(
-        DateTime startDate,
-        DateTime endDate,
+        DateOnly startDate,
+        DateOnly endDate,
         CoverType type,
         IPremiumCalculator premiumCalculator)
     {
@@ -41,5 +41,5 @@ public class Cover
         return new Cover(Guid.NewGuid().ToString(), startDate, endDate, type, premium);
     }
 
-    public bool CoversDate(DateTime date) => date.Date >= StartDate.Date && date.Date <= EndDate.Date;
+    public bool CoversDate(DateOnly date) => date >= StartDate && date <= EndDate;
 }

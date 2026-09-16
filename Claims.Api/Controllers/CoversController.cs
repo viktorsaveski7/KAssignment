@@ -22,17 +22,18 @@ public class CoversController : ControllerBase
 
     [HttpGet("compute")]
     [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<decimal>> ComputePremiumAsync(
-        [FromQuery] DateTime startDate,
-        [FromQuery] DateTime endDate,
+        [FromQuery] DateOnly startDate,
+        [FromQuery] DateOnly endDate,
         [FromQuery] CoverType coverType,
         CancellationToken cancellationToken)
     {
-        var premium = await _sender.Send(
+        var result = await _sender.Send(
             new ComputePremiumQuery(startDate, endDate, coverType),
             cancellationToken);
 
-        return Ok(premium);
+        return result.ToActionResult(this);
     }
 
     [HttpGet]

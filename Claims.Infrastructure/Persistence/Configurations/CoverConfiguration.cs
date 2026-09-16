@@ -13,8 +13,13 @@ public sealed class CoverConfiguration : IEntityTypeConfiguration<Cover>
 
         builder.HasKey(cover => cover.Id);
 
-        builder.Property(cover => cover.StartDate).HasElementName("startDate");
-        builder.Property(cover => cover.EndDate).HasElementName("endDate");
+        builder.Property(cover => cover.StartDate)
+            .HasElementName("startDate")
+            .HasConversion(DateOnlyConverter.Instance);
+
+        builder.Property(cover => cover.EndDate)
+            .HasElementName("endDate")
+            .HasConversion(DateOnlyConverter.Instance);
         builder.Property(cover => cover.Type).HasElementName("claimType");
         builder.Property(cover => cover.Premium).HasElementName("premium");
     }

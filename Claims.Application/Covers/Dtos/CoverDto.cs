@@ -5,8 +5,8 @@ namespace Claims.Application.Covers.Dtos;
 
 public record CoverDto(
     string Id,
-    DateTime StartDate,
-    DateTime EndDate,
+    DateOnly StartDate,
+    DateOnly EndDate,
     CoverType Type,
     decimal Premium)
 {
