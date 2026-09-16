@@ -39,8 +39,13 @@ public static class DependencyInjection
         return services;
     }
 
-    private static string Require(IConfiguration configuration, string key) =>
-        configuration[key]
-        ?? throw new InvalidOperationException(
-            $"Configuration value '{key}' is missing. The application cannot start without it.");
+    private static string Require(IConfiguration configuration, string key)
+    {
+        var value = configuration[key];
+
+        return string.IsNullOrWhiteSpace(value)
+            ? throw new InvalidOperationException(
+                $"Configuration value '{key}' is missing. The application cannot start without it.")
+            : value;
+    }
 }

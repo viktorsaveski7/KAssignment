@@ -28,7 +28,7 @@ public sealed class AuditWriterService : BackgroundService
         {
             await foreach (var entry in _queue.Reader.ReadAllAsync(stoppingToken))
             {
-                await WriteBatchAsync(Collect(entry), stoppingToken);
+                await WriteBatchAsync(Collect(entry));
             }
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -44,7 +44,7 @@ public sealed class AuditWriterService : BackgroundService
 
         while (_queue.Reader.TryRead(out var entry))
         {
-            await WriteBatchAsync(Collect(entry), CancellationToken.None);
+            await WriteBatchAsync(Collect(entry));
         }
     }
 
@@ -60,7 +60,7 @@ public sealed class AuditWriterService : BackgroundService
         return batch;
     }
 
-    private async Task WriteBatchAsync(IReadOnlyList<AuditEntry> batch, CancellationToken cancellationToken)
+    private async Task WriteBatchAsync(IReadOnlyList<AuditEntry> batch)
     {
         try
         {
@@ -89,7 +89,7 @@ public sealed class AuditWriterService : BackgroundService
                 }
             }
 
-            await auditContext.SaveChangesAsync(cancellationToken);
+            await auditContext.SaveChangesAsync(CancellationToken.None);
         }
         catch (Exception exception)
         {
