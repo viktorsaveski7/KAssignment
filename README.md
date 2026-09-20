@@ -3,6 +3,21 @@
 Insurance claims handling. Covers are taken out on vessels and claims are filed against them.
 Claims and covers live in MongoDB; an audit trail of every create and delete lives in SQL Server.
 
+## Live demo
+
+**<http://claims-api.runasp.net/swagger>**
+
+A deployed instance you can call directly. Health of its two databases:
+**<http://claims-api.runasp.net/health>**
+
+A couple of things worth knowing:
+
+- It runs on free hosting and **sleeps when idle**, so the first request after a quiet spell can
+  take up to a minute. Subsequent calls are fast.
+- The data is a shared sandbox with no authentication — treat anything in it as disposable.
+- Worth trying: `POST /Covers` then `POST /Claims` against the id it returns. A `damageCost` over
+  100,000, or a `created` date outside the cover period, will come back as a 400 problem document.
+
 ## Running it
 
 Needs the .NET 9 SDK and a running Docker daemon.
@@ -20,7 +35,11 @@ restart.**
 To run against real databases, set `UseDevelopmentContainers=false` and supply
 `ConnectionStrings__AuditDatabase`, `ConnectionStrings__ClaimsDatabase` and `MongoDb__DatabaseName`.
 Nothing else changes, which is what makes it deployable. The audit schema is applied from EF Core
-migrations on startup.
+migrations on startup, and `EnableSwagger=true` exposes the API documentation on a hosted instance.
+
+The live demo above is that same build: `dotnet publish` output on IIS, with MongoDB Atlas for
+claims and covers and a hosted SQL Server for the audit trail. No source change is needed to move
+between the two — only configuration.
 
 ## Tests
 
