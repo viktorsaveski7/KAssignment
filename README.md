@@ -5,10 +5,10 @@ Claims and covers live in MongoDB; an audit trail of every create and delete liv
 
 ## Live demo
 
-**<http://claims-api.runasp.net/swagger>**
+**<https://claims-api.runasp.net/swagger>**
 
 A deployed instance you can call directly. Health of its two databases:
-**<http://claims-api.runasp.net/health>**
+**<https://claims-api.runasp.net/health>**
 
 A couple of things worth knowing:
 
