@@ -1,28 +1,26 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Claims.Infrastructure.Auditing;
 
-/// <summary>Drains the audit queue and writes entries in batches.</summary>
+/// <summary>Drains the audit queue and hands entries to the store in batches.</summary>
 public sealed class AuditWriterService : BackgroundService
 {
     private const int MaxBatchSize = 100;
 
     private readonly AuditQueue _queue;
-    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IAuditStore _store;
     private readonly ILogger<AuditWriterService> _logger;
 
-    public AuditWriterService(
-        AuditQueue queue,
-        IServiceScopeFactory scopeFactory,
-        ILogger<AuditWriterService> logger)
+    /// <summary>Creates the service.</summary>
+    public AuditWriterService(AuditQueue queue, IAuditStore store, ILogger<AuditWriterService> logger)
     {
         _queue = queue;
-        _scopeFactory = scopeFactory;
+        _store = store;
         _logger = logger;
     }
 
+    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
@@ -66,34 +64,8 @@ public sealed class AuditWriterService : BackgroundService
     {
         try
         {
-            // AuditContext is scoped and this service is a singleton, so a scope is created per batch.
-            using var scope = _scopeFactory.CreateScope();
-            var auditContext = scope.ServiceProvider.GetRequiredService<AuditContext>();
-
-            foreach (var entry in batch)
-            {
-                if (entry.Entity == AuditedEntity.Claim)
-                {
-                    auditContext.ClaimAudits.Add(new ClaimAudit
-                    {
-                        ClaimId = entry.EntityId,
-                        HttpRequestType = entry.HttpRequestType,
-                        Created = entry.CreatedUtc
-                    });
-                }
-                else
-                {
-                    auditContext.CoverAudits.Add(new CoverAudit
-                    {
-                        CoverId = entry.EntityId,
-                        HttpRequestType = entry.HttpRequestType,
-                        Created = entry.CreatedUtc
-                    });
-                }
-            }
-
             // Deliberately not cancellable: once an entry has left the queue, abandoning the write loses it.
-            await auditContext.SaveChangesAsync(CancellationToken.None);
+            await _store.WriteAsync(batch, CancellationToken.None);
         }
         catch (Exception exception)
         {

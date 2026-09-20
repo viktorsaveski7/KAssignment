@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<ICoverRepository, CoverRepository>();
 
         services.AddSingleton<AuditQueue>();
+        services.AddSingleton<IAuditStore, AuditStore>();
         services.AddScoped<IAuditService, QueuedAuditService>();
         services.AddHostedService<AuditWriterService>();
 
