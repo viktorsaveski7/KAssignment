@@ -299,3 +299,9 @@ __pycache__/
 
 # kdiff3 temp files
 *.orig
+# Deployment secrets - never commit these
+appsettings.Production.json
+appsettings.Local.json
+appsettings.*.Local.json
+.env
+*.publishsettings

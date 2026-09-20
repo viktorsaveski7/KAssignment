@@ -6,6 +6,7 @@ using Claims.Application;
 using Claims.Infrastructure;
 using Claims.Infrastructure.Auditing;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,9 +44,17 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Hosted behind a reverse proxy that terminates TLS, so the original scheme and caller address
+// arrive as headers. Without this the app sees plain HTTP and HTTPS redirection loops.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 app.UseExceptionHandler();
 
-if (app.Environment.IsDevelopment())
+// On in development, and switchable on elsewhere so a hosted demo can expose its own API surface.
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue("EnableSwagger", false))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
