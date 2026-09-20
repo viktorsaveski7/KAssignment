@@ -30,8 +30,8 @@ dotnet test
 
 | Project | Tests | Needs Docker |
 | --- | --- | --- |
-| `Claims.UnitTests` | 132 | no |
-| `Claims.IntegrationTests` | 40 | yes |
+| `Claims.UnitTests` | 138 | no |
+| `Claims.IntegrationTests` | 41 | yes |
 
 Coverage is 98.8% of lines (migrations excluded). To reproduce:
 
@@ -50,7 +50,8 @@ dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 | `GET` | `/Covers/compute` | Price a cover without taking it out |
 | `POST` | `/Covers` | Take out a cover (premium computed server-side) |
 | `DELETE` | `/Covers/{id}` | Delete a cover |
-| `GET` | `/health` | Liveness probe |
+| `GET` | `/health` | Readiness — checks both databases |
+| `GET` | `/health/live` | Liveness — process only, no dependencies |
 
 ## Structure
 
@@ -93,11 +94,20 @@ Failures the caller is expected to handle return a `Result` carrying `Success`, 
 thrown and caught by `GlobalExceptionHandler`, which logs the detail and returns an opaque RFC 7807
 response with a `traceId`. Both paths produce the same error shape.
 
+### Health
+
+`/health` is the readiness probe: it pings MongoDB and opens a connection to SQL Server, returns
+503 when either is unreachable, and names the failing check in the body. `/health/live` is the
+liveness probe and deliberately checks nothing, so a database outage takes the instance out of
+rotation rather than having the orchestrator restart a healthy process.
+
 ### Auditing
 
 `POST` and `DELETE` are audited without the request waiting for the write. `QueuedAuditService` puts
 an entry on a bounded channel and returns; `AuditWriterService` drains it in batches on a background
-thread, resolving a scoped `AuditContext` per batch and draining what is left on shutdown.
+thread and hands each batch to an `IAuditStore`, draining whatever is left on shutdown. The store is a
+separate seam so the writer owns queueing while the store owns persistence, and so tests can substitute
+it and signal deterministically rather than sleeping.
 
 This is in-memory, so entries queued but not yet written are lost if the process is killed. In
 production I would use a transactional outbox — write the audit row in the same transaction as the

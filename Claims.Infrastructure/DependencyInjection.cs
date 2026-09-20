@@ -1,11 +1,13 @@
 using Claims.Application.Common.Interfaces;
 using Claims.Infrastructure.Auditing;
+using Claims.Infrastructure.HealthChecks;
 using Claims.Infrastructure.Persistence;
 using Claims.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MongoDB.Driver;
 
 namespace Claims.Infrastructure;
@@ -23,7 +25,7 @@ public static class DependencyInjection
 
         services.AddDbContext<AuditContext>(options => options.UseSqlServer(auditConnectionString));
 
-// MongoClient is thread-safe and owns a connection pool, so it is registered once. Creating one per
+        // MongoClient is thread-safe and owns a connection pool, so it is registered once. Creating one per
         // DbContext also makes EF build a new internal service provider each time, which it caps at twenty.
         services.AddSingleton<IMongoClient>(_ => new MongoClient(claimsConnectionString));
 
@@ -40,8 +42,30 @@ public static class DependencyInjection
         services.AddScoped<IAuditService, QueuedAuditService>();
         services.AddHostedService<AuditWriterService>();
 
+        services.AddSingleton(provider => new MongoHealthCheck(
+            provider.GetRequiredService<IMongoClient>(),
+            claimsDatabaseName));
+
+        // Tagged "ready" so a liveness probe can exclude them: a database outage should take the
+        // instance out of rotation, not have the orchestrator restart a perfectly healthy process.
+        services.AddHealthChecks()
+            .AddDbContextCheck<AuditContext>(
+                name: AuditDatabaseCheck,
+                tags: [ReadyTag])
+            .AddCheck<MongoHealthCheck>(
+                name: MongoHealthCheck.Name,
+                failureStatus: HealthStatus.Unhealthy,
+                tags: [ReadyTag],
+                timeout: TimeSpan.FromSeconds(5));
+
         return services;
     }
+
+    /// <summary>Tag marking checks that decide whether the instance can serve traffic.</summary>
+    public const string ReadyTag = "ready";
+
+    /// <summary>Name the audit database check is registered under.</summary>
+    public const string AuditDatabaseCheck = "audit-database";
 
     private static string Require(IConfiguration configuration, string key)
     {

@@ -5,6 +5,7 @@ using Claims.Api.Hosting;
 using Claims.Application;
 using Claims.Infrastructure;
 using Claims.Infrastructure.Auditing;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +40,6 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
-builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -55,7 +55,20 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/health");
+// Readiness: can this instance actually serve requests? Checks both databases.
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains(Claims.Infrastructure.DependencyInjection.ReadyTag),
+    ResponseWriter = HealthCheckResponse.WriteAsync
+});
+
+// Liveness: is the process up? Deliberately checks nothing, so a database outage takes the
+// instance out of rotation rather than getting it restarted.
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResponseWriter = HealthCheckResponse.WriteAsync
+});
 
 await using (var scope = app.Services.CreateAsyncScope())
 {

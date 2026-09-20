@@ -210,10 +210,34 @@ public class ClaimsEndpointTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Health_endpoint_reports_healthy()
+    public async Task Readiness_reports_healthy_and_names_both_database_checks()
     {
         var response = await _client.GetAsync("/health");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var report = await response.Content.ReadFromJsonAsync<HealthReportResponse>(ClaimsApiFactory.Json);
+
+        Assert.Equal("Healthy", report!.Status);
+        Assert.Equal(2, report.Checks.Count);
+        Assert.Contains(report.Checks, check => check.Name == "audit-database" && check.Status == "Healthy");
+        Assert.Contains(report.Checks, check => check.Name == "claims-database" && check.Status == "Healthy");
     }
+
+    [Fact]
+    public async Task Liveness_reports_healthy_and_checks_no_dependencies()
+    {
+        var response = await _client.GetAsync("/health/live");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var report = await response.Content.ReadFromJsonAsync<HealthReportResponse>(ClaimsApiFactory.Json);
+
+        Assert.Equal("Healthy", report!.Status);
+        Assert.Empty(report.Checks);
+    }
+
+    private sealed record HealthReportResponse(string Status, List<HealthCheckEntry> Checks);
+
+    private sealed record HealthCheckEntry(string Name, string Status, string? Description);
 }
