@@ -4,7 +4,7 @@ using Claims.Application.Covers.Queries.ComputePremium;
 using Claims.Domain.Enums;
 using Microsoft.Extensions.Time.Testing;
 
-namespace Claims.UnitTests.Application;
+namespace Claims.Tests.Unit.Application;
 
 public class CreateClaimCommandValidatorTests
 {

@@ -4,9 +4,10 @@ using Claims.Application.Covers.Dtos;
 using Claims.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Claims.IntegrationTests;
+namespace Claims.Tests.Integration;
 
 [Collection(ApiCollection.Name)]
+[Trait("Category", "Integration")]
 public class CoversEndpointTests : IAsyncLifetime
 {
     private readonly ClaimsApiFactory _factory;

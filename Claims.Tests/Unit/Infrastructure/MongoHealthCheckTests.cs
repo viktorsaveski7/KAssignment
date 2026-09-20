@@ -5,7 +5,7 @@ using MongoDB.Driver;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace Claims.UnitTests.Infrastructure;
+namespace Claims.Tests.Unit.Infrastructure;
 
 public class MongoHealthCheckTests
 {

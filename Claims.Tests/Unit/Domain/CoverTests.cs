@@ -1,7 +1,7 @@
 using Claims.Domain.Entities;
 using Claims.Domain.Enums;
 
-namespace Claims.UnitTests.Domain;
+namespace Claims.Tests.Unit.Domain;
 
 public class CoverTests
 {

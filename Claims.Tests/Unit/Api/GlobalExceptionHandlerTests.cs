@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 
-namespace Claims.UnitTests.Api;
+namespace Claims.Tests.Unit.Api;
 
 public class GlobalExceptionHandlerTests
 {

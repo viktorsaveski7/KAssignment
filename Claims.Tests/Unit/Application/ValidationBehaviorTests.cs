@@ -3,7 +3,7 @@ using Claims.Domain.Common;
 using FluentValidation;
 using MediatR;
 
-namespace Claims.UnitTests.Application;
+namespace Claims.Tests.Unit.Application;
 
 public class ValidationBehaviorTests
 {

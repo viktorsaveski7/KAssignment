@@ -9,7 +9,7 @@ using Claims.Domain.Entities;
 using Claims.Domain.Enums;
 using NSubstitute;
 
-namespace Claims.UnitTests.Application;
+namespace Claims.Tests.Unit.Application;
 
 public class CoverHandlerTests
 {

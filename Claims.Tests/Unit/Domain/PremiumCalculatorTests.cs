@@ -1,7 +1,7 @@
 using Claims.Domain.Enums;
 using Claims.Domain.Premium;
 
-namespace Claims.UnitTests.Domain;
+namespace Claims.Tests.Unit.Domain;
 
 public class PremiumCalculatorTests
 {

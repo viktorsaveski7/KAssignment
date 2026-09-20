@@ -3,9 +3,10 @@ using Claims.Application.Claims.Dtos;
 using Claims.Application.Covers.Dtos;
 using Claims.Domain.Enums;
 
-namespace Claims.IntegrationTests;
+namespace Claims.Tests.Integration;
 
 [Collection(ApiCollection.Name)]
+[Trait("Category", "Integration")]
 public class AuditTrailTests : IAsyncLifetime
 {
     private readonly ClaimsApiFactory _factory;

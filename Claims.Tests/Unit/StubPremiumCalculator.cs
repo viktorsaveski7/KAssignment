@@ -1,7 +1,7 @@
 using Claims.Domain.Enums;
 using Claims.Domain.Premium;
 
-namespace Claims.UnitTests;
+namespace Claims.Tests.Unit;
 
 public sealed class StubPremiumCalculator : IPremiumCalculator
 {

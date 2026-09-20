@@ -10,7 +10,7 @@ using MongoDB.Driver;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 
-namespace Claims.IntegrationTests;
+namespace Claims.Tests.Integration;
 
 /// <summary>Boots the API against throwaway SQL Server and MongoDB containers, started once per run.</summary>
 public class ClaimsApiFactory : WebApplicationFactory<Program>, IAsyncLifetime

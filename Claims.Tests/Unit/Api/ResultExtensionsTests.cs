@@ -3,7 +3,7 @@ using Claims.Domain.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Claims.UnitTests.Api;
+namespace Claims.Tests.Unit.Api;
 
 public class ResultExtensionsTests
 {

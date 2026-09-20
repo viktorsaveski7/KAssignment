@@ -24,16 +24,16 @@ migrations on startup.
 
 ## Tests
 
+All tests live in `Claims.Tests`, split into `Unit/` and `Integration/`. The integration tests carry
+a `Category=Integration` trait, so the fast suite can still be run on its own without Docker.
+
 ```bash
-dotnet test
+dotnet test                                    # all 179
+dotnet test --filter "Category!=Integration"   # 138 unit tests, no Docker
+dotnet test --filter "Category=Integration"    # 41 integration tests, needs Docker
 ```
 
-| Project | Tests | Needs Docker |
-| --- | --- | --- |
-| `Claims.UnitTests` | 138 | no |
-| `Claims.IntegrationTests` | 41 | yes |
-
-Coverage is 98.8% of lines (migrations excluded). To reproduce:
+Coverage is 98.9% of lines (migrations excluded). To reproduce:
 
 ```bash
 dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings

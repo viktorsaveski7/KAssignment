@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Claims.UnitTests.Infrastructure;
+namespace Claims.Tests.Unit.Infrastructure;
 
 /// <summary>
 /// Exercises the registration itself rather than the individual checks: with nothing registered,

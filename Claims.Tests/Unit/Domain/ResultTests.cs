@@ -1,6 +1,6 @@
 using Claims.Domain.Common;
 
-namespace Claims.UnitTests.Domain;
+namespace Claims.Tests.Unit.Domain;
 
 public class ResultTests
 {

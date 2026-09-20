@@ -1,6 +1,6 @@
 using Claims.Infrastructure.Auditing;
 
-namespace Claims.UnitTests.Infrastructure;
+namespace Claims.Tests.Unit.Infrastructure;
 
 /// <summary>
 /// An <see cref="IAuditStore"/> that lets a test observe and steer the background writer.

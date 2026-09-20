@@ -1,7 +1,7 @@
 using Claims.Infrastructure.Auditing;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Claims.UnitTests.Infrastructure;
+namespace Claims.Tests.Unit.Infrastructure;
 
 public class AuditWriterServiceTests
 {
